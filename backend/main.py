@@ -22,7 +22,7 @@ class Pipeline(BaseModel):
     nodes: List[Dict[str, Any]]
     edges: List[Edge]
 
-@app.post("api/pipelines/parse")
+@app.post("/api/pipelines/parse")
 def parse_pipeline(p: Pipeline):
     num_nodes = len(p.nodes)
     num_edges = len(p.edges)
