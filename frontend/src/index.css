@@ -40,3 +40,130 @@ button {
 button:disabled { opacity: 0.7; cursor: not-allowed; }
 button:hover:not(:disabled) { background: var(--accent-2); }
 
+/* Inter like the reference */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap');
+
+/* font + smoothing */
+.vs-font{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- HORIZONTAL SCROLL ROW (single line like screenshot) ---------- */
+.vs-scrollrow{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 8px 4px 10px;
+  /* nice scroll (optional) */
+  scrollbar-width: thin;
+}
+
+/* ---------- LIGHT BRAND TILE (LLMs tab) ---------- */
+.vs-tile{
+  min-width: 112px;
+  height: 64px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,.08);
+  background: #fff;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: grab;
+  /* box-shadow: 0 2px 8px rgba(15,23,42,.06); */
+  transition: transform .06s, box-shadow .15s, border-color .15s, background .15s;
+}
+.vs-tile:hover{ border-color: rgba(15,23,42,.16); box-shadow: 0 6px 16px rgba(15,23,42,.10); }
+.vs-tile:active{ transform: translateY(1px) scale(.995); cursor: grabbing; }
+
+.vs-tile__icon{
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(15,23,42,.10);
+  background: #fff;
+}
+.vs-tile__icon img{ width:18px; height:18px; object-fit: contain; display:block; }
+
+/* ---------- DARK CHUNKY CHIP (General tab) ---------- */
+.vs-chip{
+  min-width: 168px;         /* larger like ref */
+  height: 88px;             /* taller like ref */
+  padding: 12px 16px;
+  border-radius: 24px;      /* pill corners */
+  border: 1px solid rgba(255,255,255,.10);
+  background: #1f2937;
+  color: #e5e7eb;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: grab;
+  /* box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 18px 28px rgba(0,0,0,.28); */
+  transition: transform .06s, background .15s, border-color .15s;
+}
+.vs-chip:hover{ background: #374151; border-color: rgba(255,255,255,.14); }
+.vs-chip:active{ transform: translateY(1px) scale(.995); cursor: grabbing; }
+
+/* icon box inside chip */
+.vs-chip__icon{
+  /* width: 34px; height: 34px; */
+  display: grid; place-items: center;
+  font-size: 16px;
+  /* border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06); */
+}
+.vs-chip__icon img{ width:18px; height:18px; object-fit: contain; display:block; }
+
+/* label weight matches screenshot */
+.vs-label{ font-weight: 700; letter-spacing: .2px; }
+
+/* tiny socket dot used for Input/Output like your ref */
+.vs-socket{
+  width: 8px; height: 8px; border-radius: 999px;
+  background: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.04), 0 0 0 1px rgba(148,163,184,.45) inset;
+}
+/* --- COMPACT MODE OVERRIDES --- */
+.vs-compact.vs-scrollrow { gap: 8px; padding: 6px 4px; }
+
+/* Dark chunky chips */
+.vs-compact .vs-chip{
+  min-width: 70px;
+    height: 50px;
+    padding: 4px 8px;
+    border-radius: 16px;
+    /* gap: 0px 0px; */
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+/* .vs-compact .vs-chip__icon{
+  width: 24px; height: 24px;   
+  border-radius: 8px;         
+  font-size: 13px;             
+} */
+.vs-compact .vs-label{
+  font-size: 12px;   /* smaller label */
+  font-weight: 300;  /* lighter than 700 */
+}
+
+/* Light brand tiles */
+.vs-compact .vs-tile{
+  min-width: 60px;  /* was 112px */
+  height: 56px;     /* was 64px  */
+  padding: 8px 10px;
+  border-radius: 10px; /* was 12px */
+  gap: 8px;
+}
+.vs-compact .vs-tile__icon{
+  width: 24px; height: 24px;   /* was 28x28 */
+  border-radius: 7px;          /* was 8px   */
+}
+
+
