@@ -81,7 +81,7 @@ function useAutoSize(text, sizerRef){
     const w = clamp(el.scrollWidth + PAD_W, MIN_W, MAX_W);
     const h = clamp(el.scrollHeight + PAD_H, MIN_H, MAX_H);
     setSz({ width: w, height: h });
-  }, [text]);
+  }, [text, sizerRef]);
 
   return sz;
 }
