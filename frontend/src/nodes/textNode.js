@@ -1,69 +1,104 @@
-// src/nodes/textNode.js
 import { useEffect, useMemo, useRef, useState } from 'react';
 import NodeBase from './NodeBase';
 import { useStore } from '../store';
 
-const VAR_RE = /{{\s*([a-zA-Z_$][\w$]*)\s*}}/g;
-const longestLineChars = (s) =>
-  s.split(/\r?\n/).reduce((max, line) => Math.max(max, line.length), 0);
+// JS identifier inside {{ }}
+const VAR_RE = /\{\{\s*([A-Za-z_$][\w$]*)\s*\}\}/g;
 
 export const TextNode = ({ id, data }) => {
-  const updateNodeField = useStore(s => s.updateNodeField);
-  const [currText, setCurrText] = useState(data?.text || '{{input}}');
-  const taRef = useRef(null);
+  const update = useStore(s => s.updateNodeField);
 
-  const variables = useMemo(() => {
-    const found = new Set();
-    for (const match of currText.matchAll(VAR_RE)) found.add(match[1]);
-    return Array.from(found);
-  }, [currText]);
+  const [text, setText] = useState(data?.text ?? '');
+  const [vars, setVars] = useState(() => extractVars(text));
 
-  useEffect(() => { updateNodeField(id, 'text', currText); }, [id, currText, updateNodeField]);
-  useEffect(() => { updateNodeField(id, 'vars', variables); }, [id, variables, updateNodeField]);
+  // hidden sizer for measuring content
+  const sizerRef = useRef(null);
+  const size = useAutoSize(text, sizerRef);
 
-  // auto-resize height
-  useEffect(() => {
-    const el = taRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  }, [currText]);
+  // keep store in sync (optional but nice)
+  useEffect(() => { update(id, 'text', text); }, [id, text, update]);
+  useEffect(() => { update(id, 'vars', vars); }, [id, vars, update]);
 
-  const dynamicWidthCh = Math.min(Math.max(longestLineChars(currText), 20), 60);
-  const inputs = variables.map((v, i) => ({
-    id: v,
-    topPct: ((i + 1) * (100 / (variables.length + 1))),
-  }));
+  // parse vars when text changes
+  useEffect(() => { setVars(extractVars(text)); }, [text]);
+
+  // convert vars → NodeBase inputs
+  const inputs = useMemo(() => vars.map(v => ({ id: v })), [vars]);
 
   return (
     <NodeBase
       id={id}
       title="Text"
-      subtitle="Type text. Use {{var}} to add inputs."
-      width={`calc(${dynamicWidthCh}ch + 48px)`}
-      minHeight={120}
-      inputs={inputs}
-      outputs={[{ id: 'output' }]}
+      subtitle="Write text; use {{var}} to add inputs"
+      icon="📝"
+      width={size.width}       // auto width
+      minHeight={size.height}  // auto height
+      inputs={inputs}          // dynamic handles from {{var}}
+      outputs={[{ id: 'text' }]}
     >
-      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <span style={{ fontSize: 12, color: '#9CA3AF' }}>Text</span>
+      <div style={{ position:'relative' }}>
+        {/* hidden mirror for measuring */}
+        <div ref={sizerRef} style={sizerStyle}>{text || ' '}</div>
+
         <textarea
-          ref={taRef}
-          style={{
-            borderRadius: 8,
-            border: '1px solid #374151',
-            background: '#111827',
-            color: '#E5E7EB',
-            resize: 'none',
-            width: '100%',
-            lineHeight: 1.4,
-            overflow: 'hidden'
-          }}
-          rows={3}
-          value={currText}
-          onChange={(e) => setCurrText(e.target.value)}
+          value={text}
+          onChange={(e)=>setText(e.target.value)}
+          placeholder="e.g. Hello {{name}}, your total is {{amount}}."
+          style={taStyle}
         />
-      </label>
+      </div>
     </NodeBase>
   );
+};
+
+/* ------------ helpers ------------ */
+
+function extractVars(str){
+  const set = new Set();
+  let m;
+  while ((m = VAR_RE.exec(str)) !== null) set.add(m[1]);
+  // order by first occurrence so handles feel stable/left→right reading
+  const order = [];
+  for (const v of set) order.push([v, str.indexOf(`{{${v}}}`)]);
+  order.sort((a,b)=>a[1]-b[1]);
+  return order.map(x=>x[0]);
+}
+
+function useAutoSize(text, sizerRef){
+  const [sz, setSz] = useState({ width: 260, height: 140 });
+
+  useEffect(() => {
+    const el = sizerRef.current;
+    if (!el) return;
+
+    // bounds so node kabhi be-had bada/chhota na ho
+    const MIN_W = 240, MAX_W = 420;
+    const MIN_H = 120, MAX_H = 260;
+
+    // extra padding for header/subtitle/body
+    const PAD_W = 40, PAD_H = 80;
+
+    const w = clamp(el.scrollWidth + PAD_W, MIN_W, MAX_W);
+    const h = clamp(el.scrollHeight + PAD_H, MIN_H, MAX_H);
+    setSz({ width: w, height: h });
+  }, [text]);
+
+  return sz;
+}
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+/* ------------ inline styles (repo style match) ------------ */
+
+const taStyle = {
+  width:'100%', minHeight:80, resize:'none',
+  padding:0, borderRadius:8,
+  border:'1px solid #374151', background:'#111827', color:'#E5E7EB',
+  font:'14px Inter, system-ui, sans-serif', lineHeight:'20px', outline:'none'
+};
+
+const sizerStyle = {
+  position:'absolute', visibility:'hidden', zIndex:-1,
+  whiteSpace:'pre-wrap', wordBreak:'break-word',
+  font:'14px Inter, system-ui, sans-serif', lineHeight:'20px',
+  padding:10, border:'1px solid transparent', width:'100%'
 };
