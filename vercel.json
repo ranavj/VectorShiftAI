@@ -9,6 +9,5 @@
     { "src": "/api/(.*)", "dest": "backend/main.py" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "index.html" }
-  ],
-  "functions": { "backend/**.py": { "runtime": "python3.11" } }
+  ]
 }
