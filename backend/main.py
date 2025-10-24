@@ -51,5 +51,9 @@ def parse_pipeline(p: Pipeline):
     is_dag = visited == len(nodes)
     return {"num_nodes": num_nodes, "num_edges": num_edges, "is_dag": is_dag}
 
+@app.get("/api/health")
+def health():
+    return {"ok": True}
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
