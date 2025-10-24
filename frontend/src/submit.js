@@ -9,7 +9,7 @@ export const SubmitButton = () => {
   const onSubmit = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:8000/pipelines/parse', {
+      const res = await fetch('/api/pipelines/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nodes, edges }),
