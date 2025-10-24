@@ -6,7 +6,6 @@
       "use": "@vercel/static-build",
       "config": { "distDir": "build" }
     },
-    { "handle": "filesystem" },
     {
       "src": "backend/main.py",
       "use": "@vercel/python"
@@ -17,6 +16,7 @@
       "src": "/api/(.*)",
       "dest": "backend/main.py"
     },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "frontend/build/$1"
